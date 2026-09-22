@@ -3,9 +3,15 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from apps.backend.api.v1.chat import router as chat_router
+from apps.backend.api.v1.conversations import router as conversations_router
+from apps.backend.api.v1.engines import router as engines_router
 from apps.backend.api.v1.events import router as events_router
+from apps.backend.api.v1.generations import router as generations_router
 from apps.backend.api.v1.health import router as health_router
+from apps.backend.api.v1.jobs import router as jobs_router
 from apps.backend.api.v1.logs import router as logs_router
+from apps.backend.api.v1.models import router as models_router
 from apps.backend.api.v1.settings import router as settings_router
 from apps.backend.api.v1.system import router as system_router
 from apps.backend.lifespan import lifespan
@@ -73,12 +79,18 @@ def create_app() -> FastAPI:
             content=error_resp.model_dump(),
         )
 
-    # Include API Routers under /api/v1
+    # Include all API Routers under /api/v1
     app.include_router(health_router, prefix="/api/v1")
     app.include_router(system_router, prefix="/api/v1")
     app.include_router(events_router, prefix="/api/v1")
     app.include_router(logs_router, prefix="/api/v1")
     app.include_router(settings_router, prefix="/api/v1")
+    app.include_router(engines_router, prefix="/api/v1")
+    app.include_router(models_router, prefix="/api/v1")
+    app.include_router(jobs_router, prefix="/api/v1")
+    app.include_router(conversations_router, prefix="/api/v1")
+    app.include_router(chat_router, prefix="/api/v1")
+    app.include_router(generations_router, prefix="/api/v1")
 
     return app
 

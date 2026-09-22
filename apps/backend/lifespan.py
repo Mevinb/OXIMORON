@@ -7,11 +7,20 @@ from fastapi import FastAPI
 from core.config.manager import ConfigManager
 from core.contracts.models import RuntimeDiscoveryRecord, gen_uuid
 from core.events.broadcaster import EventBroadcaster
+from core.jobs.manager import JobManager
 from core.logging.logger import OximoronLogger
+from core.orchestrator.service import Orchestrator
 from core.persistence.database import DatabaseManager
+from core.process_manager.manager import ProcessManager
 from core.resource_manager.hardware import HardwareService
 from core.secrets.manager import SecretManager
+from core.services.chat_service import ChatService
+from core.services.generation_service import GenerationService
 from core.supervisor.lock import SupervisorLock
+from engines.base.registry import AdapterRegistry
+from engines.fooocus.adapter import FooocusAdapter
+from engines.forge.adapter import ForgeAdapter
+from engines.llamacpp.adapter import LlamaCppAdapter
 
 logger = OximoronLogger("lifespan")
 
@@ -49,7 +58,46 @@ async def lifespan(app: FastAPI):
     hw_service = HardwareService()
     app.state.hardware_service = hw_service
 
-    # 7. Write Discovery Record
+    # 7. Job Manager & Process Manager
+    job_manager = JobManager(db_manager=db_manager, broadcaster=broadcaster)
+    process_manager = ProcessManager(db_manager=db_manager)
+    await process_manager.reconcile_stale_processes()
+    app.state.job_manager = job_manager
+    app.state.process_manager = process_manager
+
+    # 8. Adapter Registry
+    adapter_registry = AdapterRegistry()
+    adapter_registry.register(LlamaCppAdapter())
+    adapter_registry.register(ForgeAdapter())
+    adapter_registry.register(FooocusAdapter())
+    app.state.adapter_registry = adapter_registry
+
+    # 9. Orchestrator
+    orchestrator = Orchestrator(
+        db_manager=db_manager,
+        config_manager=config_manager,
+        process_manager=process_manager,
+        job_manager=job_manager,
+        adapter_registry=adapter_registry,
+        broadcaster=broadcaster,
+    )
+    app.state.orchestrator = orchestrator
+
+    # 10. Domain Services
+    chat_service = ChatService(
+        db_manager=db_manager,
+        job_manager=job_manager,
+        adapter_registry=adapter_registry,
+    )
+    generation_service = GenerationService(
+        db_manager=db_manager,
+        job_manager=job_manager,
+        adapter_registry=adapter_registry,
+    )
+    app.state.chat_service = chat_service
+    app.state.generation_service = generation_service
+
+    # 11. Write Discovery Record
     current_proc = psutil.Process(os.getpid())
     host = config.server.host
     port = getattr(app.state, "active_port", config.server.preferred_port)
