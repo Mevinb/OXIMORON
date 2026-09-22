@@ -43,7 +43,14 @@ async def discover_engines(
     _token: str = Depends(verify_bearer_token),
     orchestrator: Orchestrator = Depends(get_orchestrator),
 ):
-    return await orchestrator.discover_candidates()
+    candidates = await orchestrator.discover_candidates()
+    for c in candidates:
+        await orchestrator.register_engine(
+            adapter_key=c.adapter_key,
+            display_name=c.display_name,
+            config_key=c.config_key,
+        )
+    return await orchestrator.list_engines()
 
 @router.post("/{engine_id}/start", response_model=JobDescriptor)
 async def start_engine(

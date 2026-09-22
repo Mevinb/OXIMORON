@@ -11,7 +11,7 @@ import {
   AlertCircle,
   Clock,
 } from 'lucide-react';
-import { api, ConversationItem, EngineItem, MessageItem } from '../../lib/api';
+import { api, ConversationItem, EngineItem, MessageItem, isEngineRunning } from '../../lib/api';
 
 export const ChatPage: React.FC = () => {
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
@@ -126,7 +126,7 @@ export const ChatPage: React.FC = () => {
   };
 
   const llamaEngine = engines.find((e) => e.adapter_key === 'llamacpp');
-  const isLlamaRunning = llamaEngine?.observed_state === 'RUNNING';
+  const isLlamaRunning = isEngineRunning(llamaEngine?.observed_state);
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden">

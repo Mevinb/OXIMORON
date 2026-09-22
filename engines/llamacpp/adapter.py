@@ -137,6 +137,7 @@ class LlamaCppAdapter(BaseEngineAdapter):
     ) -> AsyncGenerator[str, None]:
         url = f"{endpoint}/v1/chat/completions"
         payload = {
+            "model": options.get("model") or "default",
             "messages": messages,
             "stream": True,
             "temperature": options.get("temperature", 0.7),

@@ -47,6 +47,12 @@ export interface EngineItem {
   };
 }
 
+export function isEngineRunning(state?: string): boolean {
+  if (!state) return false;
+  const s = state.toLowerCase();
+  return s === 'ready' || s === 'busy' || s === 'running';
+}
+
 export interface ModelItem {
   id: string;
   name: string;
@@ -245,6 +251,10 @@ class ApiService {
               const data = JSON.parse(raw);
               if (data.delta) {
                 onDelta?.(data.delta);
+              }
+              if (data.error) {
+                onError?.(new Error(data.error));
+                return;
               }
             } catch {
               // ignore partial lines

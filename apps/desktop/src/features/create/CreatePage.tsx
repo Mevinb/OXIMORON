@@ -11,7 +11,7 @@ import {
   Copy,
   Check,
 } from 'lucide-react';
-import { api, EngineItem, GenerationItem } from '../../lib/api';
+import { api, EngineItem, GenerationItem, isEngineRunning } from '../../lib/api';
 
 export const CreatePage: React.FC = () => {
   const [prompt, setPrompt] = useState('hyperrealistic cinematic portrait of a neon cybernetic owl in a cyberpunk city, 8k, highly detailed, dramatic lighting');
@@ -61,7 +61,7 @@ export const CreatePage: React.FC = () => {
   }, [generating]);
 
   const forgeEngine = engines.find((e) => e.adapter_key === 'forge');
-  const isForgeRunning = forgeEngine?.observed_state === 'RUNNING';
+  const isForgeRunning = isEngineRunning(forgeEngine?.observed_state);
 
   const handleGenerate = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();

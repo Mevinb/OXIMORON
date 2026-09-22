@@ -6,7 +6,7 @@ import {
   RefreshCw,
   Search,
 } from 'lucide-react';
-import { api, EngineItem } from '../../lib/api';
+import { api, EngineItem, isEngineRunning } from '../../lib/api';
 
 export const EnginesPage: React.FC = () => {
   const [engines, setEngines] = useState<EngineItem[]>([]);
@@ -46,7 +46,7 @@ export const EnginesPage: React.FC = () => {
   const handleToggleEngine = async (engine: EngineItem) => {
     setActionInProgress(engine.id);
     try {
-      if (engine.observed_state === 'RUNNING') {
+      if (isEngineRunning(engine.observed_state)) {
         await api.stopEngine(engine.id);
       } else {
         await api.startEngine(engine.id);
@@ -98,7 +98,7 @@ export const EnginesPage: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {engines.map((engine) => {
-            const isRunning = engine.observed_state === 'RUNNING';
+            const isRunning = isEngineRunning(engine.observed_state);
             const isActing = actionInProgress === engine.id;
 
           return (

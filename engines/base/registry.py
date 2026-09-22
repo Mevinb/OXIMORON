@@ -20,6 +20,9 @@ class AdapterRegistry:
             )
         return adapter
 
+    def has(self, adapter_key: str) -> bool:
+        return adapter_key in self._adapters
+
     def list_keys(self) -> list[str]:
         return list(self._adapters.keys())
 

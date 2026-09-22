@@ -70,6 +70,24 @@ class Orchestrator:
 
         engine_id = gen_uuid()
         async with self.db.session() as session:
+            stmt = select(EngineModel).where(EngineModel.config_key == config_key)
+            res = await session.execute(stmt)
+            existing = res.scalar_one_or_none()
+            if existing:
+                existing.display_name = display_name
+                existing.adapter_key = adapter_key
+                existing.capability_json = caps.model_dump(mode="json")
+                return EngineDescriptor(
+                    id=existing.id,
+                    adapter_key=existing.adapter_key,
+                    display_name=existing.display_name,
+                    config_key=existing.config_key,
+                    version=existing.version,
+                    capabilities=caps,
+                    observed_state=EngineState(existing.observed_state),
+                    endpoint=existing.endpoint,
+                )
+
             model = EngineModel(
                 id=engine_id,
                 adapter_key=adapter_key,

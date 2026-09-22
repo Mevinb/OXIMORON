@@ -67,3 +67,9 @@ markers = [
     "live_engine: tests requiring real installed local engines",
     "hardware: tests requiring physical GPU hardware",
 ]
+
+[dependency-groups]
+dev = [
+    "playwright>=1.63.0",
+    "pytest-playwright>=0.9.0",
+]

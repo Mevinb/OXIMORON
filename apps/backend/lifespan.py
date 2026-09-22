@@ -83,6 +83,19 @@ async def lifespan(app: FastAPI):
     )
     app.state.orchestrator = orchestrator
 
+    # Auto-register configured default engines
+    for key, engine_cfg in config.engines.items():
+        if adapter_registry.has(key):
+            adapter = adapter_registry.get(key)
+            try:
+                await orchestrator.register_engine(
+                    adapter_key=key,
+                    display_name=adapter.display_name,
+                    config_key=key,
+                )
+            except Exception as e:
+                logger.warn(f"Could not auto-register engine {key}: {e}")
+
     # 10. Domain Services
     chat_service = ChatService(
         db_manager=db_manager,

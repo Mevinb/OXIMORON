@@ -18,6 +18,7 @@ import {
   SystemSnapshot,
   EngineItem,
   ModelItem,
+  isEngineRunning,
 } from '../../lib/api';
 import { NavDestination } from '../../components/Sidebar';
 
@@ -60,7 +61,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onTriggerScan })
 
   const handleToggleEngine = async (engine: EngineItem) => {
     try {
-      if (engine.observed_state === 'RUNNING') {
+      if (isEngineRunning(engine.observed_state)) {
         await api.stopEngine(engine.id);
       } else {
         await api.startEngine(engine.id);
@@ -284,7 +285,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onTriggerScan })
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {engines.map((engine) => {
-            const isRunning = engine.observed_state === 'RUNNING';
+            const isRunning = isEngineRunning(engine.observed_state);
             return (
               <div
                 key={engine.id}
