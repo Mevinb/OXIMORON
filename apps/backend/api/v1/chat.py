@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
 
 from apps.backend.dependencies import verify_bearer_token
@@ -7,7 +7,7 @@ from core.services.chat_service import ChatService
 
 router = APIRouter(prefix="/chat", tags=["Chat"])
 
-def get_chat_service(request) -> ChatService:
+def get_chat_service(request: Request) -> ChatService:
     return request.app.state.chat_service
 
 @router.post("")

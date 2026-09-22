@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 from pydantic import BaseModel
 from sqlalchemy import select
 
@@ -9,13 +9,13 @@ from core.jobs.manager import JobManager
 from core.persistence.database import DatabaseManager
 from core.persistence.models import JobModel
 
-router = APIRouter(prefix="/jobs", tags=["Jobs"])
+router = APIRouter(prefix="/jobs", tags=["Jobs & Operations"])
 
 class JobListResponse(BaseModel):
     jobs: list[JobDescriptor]
     total: int
 
-def get_job_manager(request) -> JobManager:
+def get_job_manager(request: Request) -> JobManager:
     return request.app.state.job_manager
 
 @router.get("", response_model=JobListResponse)

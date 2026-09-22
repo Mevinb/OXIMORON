@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 from pydantic import BaseModel
 
 from apps.backend.dependencies import verify_bearer_token
@@ -11,7 +11,7 @@ class CreateConversationRequest(BaseModel):
     title: str = "New Conversation"
     system_prompt: str | None = None
 
-def get_chat_service(request) -> ChatService:
+def get_chat_service(request: Request) -> ChatService:
     return request.app.state.chat_service
 
 @router.get("", response_model=list[ConversationDescriptor])

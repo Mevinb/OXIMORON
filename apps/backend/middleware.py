@@ -53,6 +53,16 @@ class SecurityAndTracingMiddleware(BaseHTTPMiddleware):
                     content=error_resp.model_dump(),
                 )
 
+        if request.method == "OPTIONS":
+            resp = Response(status_code=204)
+            resp.headers["X-Request-ID"] = request_id
+            if origin and any(p.match(origin) for p in ALLOWED_ORIGIN_PATTERNS):
+                resp.headers["Access-Control-Allow-Origin"] = origin
+                resp.headers["Access-Control-Allow-Credentials"] = "true"
+                resp.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type, Idempotency-Key, X-Request-ID"
+                resp.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+            return resp
+
         response = await call_next(request)
         response.headers["X-Request-ID"] = request_id
         if origin and any(p.match(origin) for p in ALLOWED_ORIGIN_PATTERNS):

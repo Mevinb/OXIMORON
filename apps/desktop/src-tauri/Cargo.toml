@@ -1,0 +1,15 @@
+[package]
+name = "oximoron"
+version = "0.1.0"
+description = "OXIMORON Desktop AI Orchestration Center"
+authors = ["OXIMORON Team"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2.0.0", features = [] }
+
+[dependencies]
+tauri = { version = "2.0.0" }
+libdbus-sys = { version = "0.2", features = ["vendored"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"

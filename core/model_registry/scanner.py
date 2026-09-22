@@ -74,9 +74,8 @@ class ModelScanner:
             res = await session.execute(stmt)
             existing_loc = res.scalar_one_or_none()
             if existing_loc:
-                if existing_loc.mtime_ns != mtime_ns or existing_loc.byte_size != byte_size:
+                if existing_loc.mtime_ns != mtime_ns:
                     existing_loc.mtime_ns = mtime_ns
-                    existing_loc.byte_size = byte_size
                 return
 
         # 2. Parse metadata

@@ -28,13 +28,18 @@ def verify_bearer_token(
     authorization: str | None = Header(default=None),
 ) -> str:
     secret_manager: SecretManager = request.app.state.secret_manager
-    if not authorization or not authorization.startswith("Bearer "):
+    token: str | None = None
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.removeprefix("Bearer ").strip()
+    elif "token" in request.query_params:
+        token = request.query_params["token"]
+
+    if not token:
         raise OximoronException(
             code=ErrorCode.UNAUTHORIZED,
-            message="Missing or malformed Authorization header. Expected 'Bearer <token>'.",
+            message="Missing Authorization header or 'token' query param.",
             status_code=401,
         )
-    token = authorization.removeprefix("Bearer ").strip()
     if not secret_manager.validate_token(token):
         raise OximoronException(
             code=ErrorCode.UNAUTHORIZED,

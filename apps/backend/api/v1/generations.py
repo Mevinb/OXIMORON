@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import FileResponse
 
 from apps.backend.dependencies import verify_bearer_token
@@ -13,7 +13,7 @@ from core.services.generation_service import GenerationService
 
 router = APIRouter(tags=["Generations & Artifacts"])
 
-def get_generation_service(request) -> GenerationService:
+def get_generation_service(request: Request) -> GenerationService:
     return request.app.state.generation_service
 
 @router.post("/generate/image", response_model=GenerationDescriptor)

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
 
 from apps.backend.dependencies import verify_bearer_token
@@ -16,7 +16,7 @@ class StartEngineRequest(BaseModel):
     model_path: str | None = None
     model_id: str | None = None
 
-def get_orchestrator(request) -> Orchestrator:
+def get_orchestrator(request: Request) -> Orchestrator:
     return request.app.state.orchestrator
 
 @router.get("", response_model=list[EngineDescriptor])
