@@ -32,10 +32,13 @@ class StatusSummary(BaseModel):
     ram_total_gb: float
     gpu_available: bool
 
+class SessionResponse(BaseModel):
+    token: str
+    supervisor_id: str
+
 @router.get("/health", response_model=HealthResponse)
 async def get_health(
     request: Request,
-    _token: str = Depends(verify_bearer_token),
     hw_service: HardwareService = Depends(get_hardware_service),
 ):
     snapshot = hw_service.get_snapshot()
@@ -48,6 +51,18 @@ async def get_health(
             hardware_nvml=snapshot.gpu_status,
             supervisor="ok",
         ),
+    )
+
+@router.get("/session", response_model=SessionResponse)
+async def get_session(
+    request: Request,
+):
+    token = getattr(request.app.state, "api_token", "")
+    discovery = getattr(request.app.state, "discovery_record", None)
+    sup_id = discovery.supervisor_instance_id if discovery else "unknown"
+    return SessionResponse(
+        token=token,
+        supervisor_id=sup_id,
     )
 
 @router.get("/status", response_model=StatusSummary)

@@ -139,6 +139,12 @@ class ApiService {
     return response.json();
   }
 
+  async getSession(): Promise<{ token: string; supervisor_id: string }> {
+    const res = await fetch('/api/v1/session');
+    if (!res.ok) throw new Error('Failed to fetch session');
+    return res.json();
+  }
+
   async getStatus(): Promise<StatusSummary> {
     return this.request<StatusSummary>('/status');
   }

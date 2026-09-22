@@ -19,11 +19,17 @@ def client(tmp_path, monkeypatch):
         yield test_client
 
 def test_unauthenticated_request_fails(client):
-    response = client.get("/api/v1/health")
+    response = client.get("/api/v1/status")
     assert response.status_code == 401
     data = response.json()
     assert "error" in data
     assert data["error"]["code"] == ErrorCode.UNAUTHORIZED
+
+def test_unauthenticated_health_readiness_probe_succeeds(client):
+    response = client.get("/api/v1/health")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "ok"
 
 def test_authenticated_health_request_succeeds(client):
     token = client.app.state.api_token

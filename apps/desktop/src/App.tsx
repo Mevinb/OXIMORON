@@ -24,6 +24,15 @@ export const App: React.FC = () => {
   useEffect(() => {
     if (apiToken) {
       api.setToken(apiToken);
+    } else {
+      // Auto-fetch local session token from loopback backend
+      api.getSession().then((session) => {
+        if (session?.token) {
+          handleUpdateToken(session.token);
+        }
+      }).catch(() => {
+        // Backend might still be starting up
+      });
     }
   }, [apiToken]);
 
@@ -39,6 +48,17 @@ export const App: React.FC = () => {
       setStatus(res);
       setConnected(true);
     } catch {
+      // If unauthorized or disconnected, attempt to re-sync session token
+      try {
+        const session = await api.getSession();
+        if (session?.token && session.token !== apiToken) {
+          handleUpdateToken(session.token);
+          const res = await api.getStatus();
+          setStatus(res);
+          setConnected(true);
+          return;
+        }
+      } catch {}
       setConnected(false);
     }
   };
