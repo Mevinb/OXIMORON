@@ -50,7 +50,12 @@ packages = ["core", "engines", "apps"]
 line-length = 100
 target-version = "py312"
 
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]
+
 [tool.pytest.ini_options]
+pythonpath = ["."]
 asyncio_mode = "auto"
 testpaths = ["tests"]
 python_files = ["test_*.py"]
