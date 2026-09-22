@@ -1,0 +1,10 @@
+{
+  "name": "oximoron-workspace",
+  "private": true,
+  "scripts": {
+    "dev:desktop": "pnpm --filter @oximoron/desktop dev",
+    "build:desktop": "pnpm --filter @oximoron/desktop build",
+    "typecheck": "pnpm --filter @oximoron/desktop typecheck",
+    "test:desktop": "pnpm --filter @oximoron/desktop test"
+  }
+}
